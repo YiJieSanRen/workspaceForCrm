@@ -19,27 +19,25 @@ public class LoginFilter implements Filter {
         String path = request.getServletPath();
 
         //不应该被拦截的资源，自动放行请求
-        if ("/login.jsp".equals(path) || "/settings/user/login.do".equals(path)){
+        if ("/login.jsp".equals(path) || "/setting/user/login.do".equals(path)){
 
             chain.doFilter(req,resp);
 
         //其他资源必须验证有没有登录过
         }else{
 
-        }
+            HttpSession session = request.getSession();
+            User user = (User) session.getAttribute("user");
 
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
+            //如果user不为null，说明登录过
+            if (user!=null){
 
-        //如果user不为null，说明登录过
-        if (user!=null){
+                chain.doFilter(request,response);
 
-            chain.doFilter(request,response);
+                //没有登录过
+            }else {
 
-        //没有登录过
-        }else {
-
-            //重定向到登录页
+                //重定向到登录页
             /*
                 重定向的路径怎么写？
                 在实际项目开发中，对于路径的使用，不论操作的是前端还是后端，应该一律使用绝对路径
@@ -57,7 +55,9 @@ public class LoginFilter implements Filter {
 
 
             */
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+
+            }
 
         }
 
