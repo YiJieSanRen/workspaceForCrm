@@ -16,6 +16,8 @@
     <typeAliases>
         <!--name:实体类所在的包名-->
         <package name="com.bjpowernode.crm.settings.domain"/>
+        <package name="com.bjpowernode.crm.workbench.domain"/>
+
     </typeAliases>
 
     <environments default="development">
@@ -33,6 +35,7 @@
     <!-- sql mapper(sql映射文件)的位置-->
     <mappers>
         <package name="com.bjpowernode.crm.settings.dao"/>
+        <package name="com.bjpowernode.crm.workbench.dao"/>
     </mappers>
 </configuration>
 
