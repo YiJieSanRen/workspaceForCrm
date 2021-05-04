@@ -27,5 +27,12 @@ $.ajax({
 
     }
 })
+
+    //创建时间：当前系统时间
+    String createTime = DateTimeUtil.getSysTime();
+    //创建人：当前登录的用户
+    String createBy = ((User) request.getSession().getAttribute("user")).getName();
+
+
 </body>
 </html>

@@ -23,6 +23,14 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 		//为创建按钮绑定事件，打开添加操作的模态窗口
 		$("#addBtn").click(function () {
 
+			$(".time").datetimepicker({
+				minView: "month",
+				language:  'zh-CN',
+				format: 'yyyy-mm-dd',
+				autoclose: true,
+				todayBtn: true,
+				pickerPosition: "bottom-left"
+			});
 			/*
 
 				操作模态窗口的方式：
@@ -31,7 +39,117 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 
 			*/
 
-			$("#createActivityModal").modal("show");
+			//alert(123);
+			//$("#createActivityModal").modal("show");
+
+			//走后台，目的是为了取得用户信息列表，为所有者下拉框铺值
+			$.ajax({
+
+				url:"workbench/activity/getUserList.do",
+				type:"get",
+				dataType:"json",
+				success:function (data){
+
+					/*
+
+						List<User> uList
+
+						data
+							[{"id":?,"name":?,"loginAct":?......}，{2}，{3}...]
+
+					*/
+
+					var html = "<option></option>"
+
+					//遍历出来的每一个n,就是每一个user对象
+					$.each(data,function (i,n) {
+
+						html += "<option value='"+n.id+"'>"+n.name+"</option>";
+
+					})
+
+					$("#create-owner").html(html);
+
+					//将当前登录的用户，设置为下拉框默认的选项
+					/*
+
+						<select id="create-owner">
+							<option value="40f6cdea0bd34aceb77492a1656d9fb3">张三</option>
+							<option value="06f5fc056eac41558a964f96daa7f27c">李四</option>
+						</select>
+
+						$("#create-owner").val("40f6cdea0bd34aceb77492a1656d9fb3");
+					*/
+
+					//取得当前登录用户的id
+					//在js中使用el表达式，el表达式一定要套用在字符串中
+					var id = "${user.id}";
+
+					$("#create-owner").val(id);
+					//所有者下拉框处理完毕后，展现模态窗口
+					$("#createActivityModal").modal("show");
+				}
+			})
+
+			//为保存按钮绑定事件，执行添加操作
+			$("#saveBtn").click(function () {
+
+				$.ajax({
+
+					url:"workbench/activity/save.do",
+					data:{
+
+						"owner" : $.trim($("#create-owner").val()),
+						"name" : $.trim($("#create-name").val()),
+						"startDate" : $.trim($("#create-startDate").val()),
+						"endDate" : $.trim($("#create-endDate").val()),
+						"cost" : $.trim($("#create-cost").val()),
+						"description" : $.trim($("#create-description").val())
+
+					},
+					type:"post",
+					dataType:"json",
+					success:function (data){
+
+						/*
+
+							date
+								{"success":true/false}
+						 */
+						if (data.success){
+							//添加成功后
+							//刷新市场活动信息列表（局部刷新）
+
+							//清空添加操作模态窗口中的数据
+							//提交表单
+							//$("#activityAddForm").submit();
+
+							/*
+								注意：
+									我们拿到了form表单的jquery对象
+									对于表单的jquery对象，提供了submit()方法让我们提交表单
+									但是表单的jquery对象，没有为我们提供reset()方法让我们重置表单（坑：idea为我们提示了有reset()方法）
+
+									虽然jquery对象没有为我们提供reset方法，但是原生js为我们提供了reset方法
+									所以我们要将jquery对象转换为原生dom对象
+
+									jquery对象转换为dom对象：
+										jquery对象[下标]
+
+									dom对象转换为jquery对象：
+										$(dom)
+							 */
+							$("#activityAddForm")[0].reset();
+
+							//关闭添加操作的模态窗口
+							$("#createActivityModal").modal("hide");
+						}else{
+							alert("添加市场活动失败")
+						}
+					}
+				})
+
+			})
 
 		})
 		
@@ -53,31 +171,29 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				</div>
 				<div class="modal-body">
 				
-					<form class="form-horizontal" role="form">
+					<form id="activityAddForm" class="form-horizontal" role="form">
 					
 						<div class="form-group">
-							<label for="create-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
+							<label for="create-owner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
-								<select class="form-control" id="create-marketActivityOwner">
-								  <option>zhangsan</option>
-								  <option>lisi</option>
-								  <option>wangwu</option>
+								<select class="form-control" id="create-owner">
+
 								</select>
 							</div>
-                            <label for="create-marketActivityName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
+                            <label for="create-name" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
                             <div class="col-sm-10" style="width: 300px;">
-                                <input type="text" class="form-control" id="create-marketActivityName">
+                                <input type="text" class="form-control" id="create-name">
                             </div>
 						</div>
 						
 						<div class="form-group">
-							<label for="create-startTime" class="col-sm-2 control-label">开始日期</label>
+							<label for="create-startDate" class="col-sm-2 control-label">开始日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-startTime">
+								<input type="text" class="form-control time" id="create-startDate" readonly>
 							</div>
-							<label for="create-endTime" class="col-sm-2 control-label">结束日期</label>
+							<label for="create-endDate" class="col-sm-2 control-label">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-endTime">
+								<input type="text" class="form-control time" id="create-endDate" readonly>
 							</div>
 						</div>
                         <div class="form-group">
@@ -88,9 +204,9 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
                             </div>
                         </div>
 						<div class="form-group">
-							<label for="create-describe" class="col-sm-2 control-label">描述</label>
+							<label for="create-description" class="col-sm-2 control-label">描述</label>
 							<div class="col-sm-10" style="width: 81%;">
-								<textarea class="form-control" rows="3" id="create-describe"></textarea>
+								<textarea class="form-control" rows="3" id="create-description"></textarea>
 							</div>
 						</div>
 						
@@ -98,8 +214,14 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 					
 				</div>
 				<div class="modal-footer">
+					<!--
+
+						data-dismiss="modal"
+							表示关闭模态窗口
+
+					-->
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">保存</button>
+					<button type="button" class="btn btn-primary" id="saveBtn">保存</button>
 				</div>
 			</div>
 		</div>
