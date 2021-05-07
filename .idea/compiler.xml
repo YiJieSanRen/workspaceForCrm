@@ -11,6 +11,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="crm" target="1.5" />
+      <module name="Examination_System" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

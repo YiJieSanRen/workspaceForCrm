@@ -1,0 +1,23 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="Examination_System:war exploded">
+    <output-path>$USER_HOME$/Desktop/Examination_System-master/target/Examination_System</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <exploded>true</exploded>
+        <module>Examination_System</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="Examination_System" />
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$USER_HOME$/Desktop/Examination_System-master/target/Examination_System/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="Examination_System/web/Web" />
+    </root>
+  </artifact>
+</component>
