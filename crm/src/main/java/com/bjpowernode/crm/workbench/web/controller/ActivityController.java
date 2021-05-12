@@ -10,6 +10,7 @@ import com.bjpowernode.crm.workbench.service.ActivityService;
 import com.bjpowernode.crm.workbench.service.impl.ActivityServiceImpl;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +44,77 @@ public class ActivityController extends HttpServlet {
 
             delete(request,response);
 
+        }else if("/workbench/activity/getUerListAndActivity.do".equals(path)){
+
+            getUerListAndActivity(request,response);
+
+        }else if("/workbench/activity/update.do".equals(path)){
+
+            update(request,response);
+
         }
+
+    }
+
+    private void update(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("执行市场活动修改操作");
+
+        String id = request.getParameter("id");
+        String owner = request.getParameter("owner");
+        String name = request.getParameter("name");
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+        String cost = request.getParameter("cost");
+        String description = request.getParameter("description");
+        //创建时间：当前系统时间
+        String editTime = DateTimeUtil.getSysTime();
+        //创建人：当前登录的用户
+        String editBy = ((User) request.getSession().getAttribute("user")).getName();
+
+        Activity a = new Activity();
+        a.setId(id);
+        a.setCost(cost);
+        a.setStartDate(startDate);
+        a.setOwner(owner);
+        a.setName(name);
+        a.setEndDate(endDate);
+        a.setDescription(description);
+        a.setEditBy(editBy);
+        a.setEditTime(editTime);
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+
+        boolean flag = as.update(a);
+
+        PrintJson.printJsonFlag(response,flag);
+
+    }
+
+    private void getUerListAndActivity(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("进入到查询用户信息列表和根据市场活动id查询单条记录的操作");
+
+        String id = request.getParameter("id");
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+
+        /*
+            总结：
+                controller调用service的方法，返回值应该是什么
+                你得想一想前端要什么，就要从service层取什么
+
+            前端需要的，管业务层去要
+            uList
+            a
+
+            以上两项信息，复用率不高，我们选择使用map打包这两项信息即可
+            map
+
+         */
+
+        Map<String,Object> map = as.getUerListAndActivity(id);
+
+        PrintJson.printJsonObj(response,map);
 
     }
 
