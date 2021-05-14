@@ -107,4 +107,10 @@ public class ActivityServiceImpl implements ActivityService {
 
         return flag;
     }
+
+    public Activity detail(String id) {
+
+        Activity a = activityDao.detail(id);
+        return a;
+    }
 }
