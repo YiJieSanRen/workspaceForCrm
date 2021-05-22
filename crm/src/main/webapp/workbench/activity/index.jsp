@@ -101,6 +101,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 
 				if ($.trim($("#create-name").val()) == ""){
 					alert("创建活动名称不能为空！");
+					$("#createActivityModal").modal("hide");
 				}else {
 					$.ajax({
 
@@ -768,7 +769,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 						</tr>
                         <tr class="active">
                             <td><input type="checkbox" /></td>
-                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">发传单</a></td>
+                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">发传单</a></td>
                             <td>zhangsan</td>
                             <td>2020-10-10</td>
                             <td>2020-10-20</td>

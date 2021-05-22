@@ -6,6 +6,7 @@ import com.bjpowernode.crm.settings.service.impl.UserServiceImpl;
 import com.bjpowernode.crm.utils.*;
 import com.bjpowernode.crm.vo.PaginationVO;
 import com.bjpowernode.crm.workbench.domain.Activity;
+import com.bjpowernode.crm.workbench.domain.ActivityRemark;
 import com.bjpowernode.crm.workbench.service.ActivityService;
 import com.bjpowernode.crm.workbench.service.impl.ActivityServiceImpl;
 
@@ -56,7 +57,106 @@ public class ActivityController extends HttpServlet {
 
             detail(request,response);
 
+        }else if("/workbench/activity/getRemarkListByAid.do".equals(path)){
+
+            getRemarkListByAid(request,response);
+
+        }else if("/workbench/activity/deleteRemark.do".equals(path)){
+
+            deleteRemark(request,response);
+
+        }else if("/workbench/activity/saveRemark.do".equals(path)){
+
+            saveRemark(request,response);
+
+        }else if("/workbench/activity/updateRemark.do".equals(path)){
+
+            updateRemark(request,response);
+
         }
+
+    }
+
+    private void updateRemark(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("执行修改备注操作");
+
+        String id = request.getParameter("id");
+        String noteContent = request.getParameter("noteContent");
+        String editTime = DateTimeUtil.getSysTime();
+        String editBy = ((User)request.getSession().getAttribute("user")).getName();
+        String editFlag = "1";
+
+        ActivityRemark ar = new ActivityRemark();
+        ar.setId(id);
+        ar.setNoteContent(noteContent);
+        ar.setEditTime(editTime);
+        ar.setEditBy(editBy);
+        ar.setEditFlag(editFlag);
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+
+        boolean flag = as.updateRemark(ar);
+
+        Map<String,Object> map = new HashMap<String, Object>();
+        map.put("success",flag);
+        map.put("ar",ar);
+
+        PrintJson.printJsonObj(response,map);
+    }
+
+    private void saveRemark(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("执行添加备注操作");
+
+        String noteContent = request.getParameter("noteContent");
+        String activityId = request.getParameter("activityId");
+        String id = UUIDUtil.getUUID();
+        String createTime = DateTimeUtil.getSysTime();
+        String createBy = ((User)request.getSession().getAttribute("user")).getName();
+        String editFlag = "0";
+
+        ActivityRemark ar = new ActivityRemark();
+        ar.setId(id);
+        ar.setNoteContent(noteContent);
+        ar.setActivityId(activityId);
+        ar.setCreateTime(createTime);
+        ar.setCreateBy(createBy);
+        ar.setEditFlag(editFlag);
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+
+        boolean flag = as.saveRemark(ar);
+
+        Map<String,Object> map = new HashMap<String, Object>();
+        map.put("success",flag);
+        map.put("ar",ar);
+
+        PrintJson.printJsonObj(response,map);
+    }
+
+    private void deleteRemark(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("删除备注操作");
+
+        String id = request.getParameter("id");
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+
+        boolean flag = as.deleteRemark(id);
+
+        PrintJson.printJsonFlag(response,flag);
+    }
+
+    private void getRemarkListByAid(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("根据市场活动id，取得备注信息列表");
+
+        String activityId = request.getParameter("activityId");
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+
+        List<ActivityRemark> arList = as.getRemarkListByAid(activityId);
+
+        PrintJson.printJsonObj(response,arList);
+
 
     }
 
