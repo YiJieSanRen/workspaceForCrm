@@ -9,7 +9,6 @@ import com.bjpowernode.crm.utils.ServiceFactory;
 import com.bjpowernode.crm.utils.UUIDUtil;
 import com.bjpowernode.crm.vo.PaginationVO;
 import com.bjpowernode.crm.workbench.domain.Activity;
-import com.bjpowernode.crm.workbench.domain.ActivityRemark;
 import com.bjpowernode.crm.workbench.domain.Clue;
 import com.bjpowernode.crm.workbench.service.ActivityService;
 import com.bjpowernode.crm.workbench.service.ClueService;
@@ -42,8 +41,122 @@ public class ClueController extends HttpServlet {
 
             save(request,response);
 
+        }else if("/workbench/clue/pageList.do".equals(path)){
+
+            pageList(request,response);
+
+        }else if("/workbench/clue/detail.do".equals(path)){
+
+            detail(request,response);
+
+        }else if("/workbench/clue/getActivityListByClueId.do".equals(path)){
+
+            getActivityListByClueId(request,response);
+
+        }else if("/workbench/clue/unbund.do".equals(path)){
+
+            unbund(request,response);
+
+        }else if("/workbench/clue/getActivityListByNameAndNotByClueId.do".equals(path)){
+
+            getActivityListByNameAndNotByClueId(request,response);
+
         }
 
+    }
+
+    private void getActivityListByNameAndNotByClueId(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("查询市场活动列表（根据名称模糊查+排除掉已经关联指定线索的列表）");
+
+        String aname = request.getParameter("aname");
+        String clueId = request.getParameter("clueId");
+
+        Map<String,String> map = new HashMap<String, String>();
+        map.put("aname",aname);
+        map.put("clueId",clueId);
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+
+        List<Activity> aList = as.getActivityListByNameAndNotByClueId(map);
+
+        PrintJson.printJsonObj(response,aList);
+    }
+
+    private void unbund(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("执行解除关联操作");
+
+        String id = request.getParameter("id");
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+        boolean flag = cs.unbund(id);
+
+        PrintJson.printJsonFlag(response,flag);
+    }
+
+    private void getActivityListByClueId(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("根据线索id查询关联的市场活动列表");
+
+        String clueId = request.getParameter("clueId");
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+
+        List<Activity> aList = as.getActivityListByClueId(clueId);
+
+        PrintJson.printJsonObj(response,aList);
+    }
+
+    private void detail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        System.out.println("跳转到线索详细信息页");
+
+        String id = request.getParameter("id");
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+        Clue c = cs.detail(id);
+
+        request.setAttribute("c",c);
+        request.getRequestDispatcher("/workbench/clue/detail.jsp").forward(request,response);
+    }
+
+    private void pageList(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("进入到查询线索信息列表的操作（结合条件查询+分页查询）");
+
+        String fullname = request.getParameter("fullname");
+        String company = request.getParameter("company");
+        String phone = request.getParameter("phone");
+        String source = request.getParameter("source");
+        String owner = request.getParameter("owner");
+        String mphone = request.getParameter("mphone");
+        String state = request.getParameter("state");
+        String pageNoStr = request.getParameter("pageNo");
+        int pageNo = Integer.valueOf(pageNoStr);
+        //每页展现的记录数
+        String pageSizeStr = request.getParameter("pageSize");
+        int pageSize = Integer.valueOf(pageSizeStr);
+        //计算出略过的记录数
+        int skipCount = (pageNo-1)*pageSize;
+
+        Map<String,Object> map = new HashMap<String, Object>();
+        map.put("fullname",fullname);
+        map.put("company",company);
+        map.put("phone",phone);
+        map.put("source",source);
+        map.put("owner",owner);
+        map.put("mphone",mphone);
+        map.put("state",state);
+        map.put("skipCount",skipCount);
+        map.put("pageSize",pageSize);
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+        PaginationVO<Clue> vo = cs.pageList(map);
+
+        //vo --> {"total":100,"dataList":[{市场活动1},{2},{3}]}
+        PrintJson.printJsonObj(response,vo);
     }
 
     private void save(HttpServletRequest request, HttpServletResponse response) {
