@@ -20,88 +20,8 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 
 	//默认情况下取消和保存按钮是隐藏的
 	var cancelAndSaveBtnDefault = true;
-	
-	$(function(){
 
-		$("#editBtn").click(function () {
-
-			$(".time").datetimepicker({
-				minView: "month",
-				language:  'zh-CN',
-				format: 'yyyy-mm-dd',
-				autoclose: true,
-				todayBtn: true,
-				pickerPosition: "bottom-left"
-			});
-
-			var id = "${a.id}";
-
-			$.ajax({
-				url:"workbench/activity/getUerListAndActivity.do",
-				data:{
-					"id":id
-				},
-				type:"get",
-				dataType:"json",
-				success:function (data){
-
-					var html = "<option></option>";
-
-					$.each(data.uList,function (i, n) {
-
-						html += "<option value='"+n.id+"'>"+n.name+"</option>";
-
-					})
-
-					$("#edit-owner").html(html);
-
-					//处理单条activity
-					$("#edit-id").val(data.a.id);
-					$("#edit-name").val(data.a.name);
-					$("#edit-owner").val(data.a.owner);
-					$("#edit-startDate").val(data.a.startDate);
-					$("#edit-endDate").val(data.a.endDate);
-					$("#edit-cost").val(data.a.cost);
-					$("#edit-description").val(data.a.description);
-
-					//所有的值都填写好之后，打开修改操作的模态窗口
-					$("#editActivityModal").modal("show");
-				}
-			})
-
-			$("#editActivityModal").modal("show");
-		})
-
-        $("#updateBtn").click(function () {
-            $.ajax({
-
-                url: "workbench/activity/update.do",
-                data: {
-
-                    "id": $.trim($("#edit-id").val()),
-                    "owner": $.trim($("#edit-owner").val()),
-                    "name": $.trim($("#edit-name").val()),
-                    "startDate": $.trim($("#edit-startDate").val()),
-                    "endDate": $.trim($("#edit-endDate").val()),
-                    "cost": $.trim($("#edit-cost").val()),
-                    "description": $.trim($("#edit-description").val())
-
-                },
-                type: "post",
-                dataType: "json",
-                success: function (data) {
-                    if (data.success) {
-
-                        //关闭关闭操作的模态窗口
-                        $("#editActivityModal").modal("hide");
-
-                    } else {
-                        alert("修改市场活动失败");
-                    }
-                }
-            })
-        });
-
+	$(function () {
 
 		$("#remark").focus(function(){
 			if(cancelAndSaveBtnDefault){
@@ -145,6 +65,87 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
         })
         $("#remarkBody").on("mouseout",".remarkDiv",function(){
             $(this).children("div").children("div").hide();
+        })
+
+        $("#editBtn").click(function () {
+
+            $(".time").datetimepicker({
+                minView: "month",
+                language:  'zh-CN',
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                todayBtn: true,
+                pickerPosition: "bottom-left"
+            });
+
+            var id = "${a.id}";
+
+            $.ajax({
+                url:"workbench/activity/getUerListAndActivity.do",
+                data:{
+                    "id":id
+                },
+                type:"get",
+                dataType:"json",
+                success:function (data){
+
+                    var html = "<option></option>";
+
+                    $.each(data.uList,function (i, n) {
+
+                        html += "<option value='"+n.id+"'>"+n.name+"</option>";
+
+                    })
+
+                    $("#edit-owner").html(html);
+
+                    //处理单条activity
+                    $("#edit-id").val(data.a.id);
+                    $("#edit-name").val(data.a.name);
+                    $("#edit-owner").val(data.a.owner);
+                    $("#edit-startDate").val(data.a.startDate);
+                    $("#edit-endDate").val(data.a.endDate);
+                    $("#edit-cost").val(data.a.cost);
+                    $("#edit-description").val(data.a.description);
+
+                    //所有的值都填写好之后，打开修改操作的模态窗口
+                    $("#editActivityModal").modal("show");
+                }
+            })
+
+            $("#editActivityModal").modal("show");
+        })
+
+        $("#updateBtn").click(function () {
+            var id = "${a.id}";
+            $.ajax({
+
+                url: "workbench/activity/update.do",
+                data: {
+
+                    "id": $.trim($("#edit-id").val()),
+                    "owner": $.trim($("#edit-owner").val()),
+                    "name": $.trim($("#edit-name").val()),
+                    "startDate": $.trim($("#edit-startDate").val()),
+                    "endDate": $.trim($("#edit-endDate").val()),
+                    "cost": $.trim($("#edit-cost").val()),
+                    "description": $.trim($("#edit-description").val())
+
+                },
+                type: "post",
+                dataType: "json",
+                success: function (data) {
+                    if (data.success) {
+
+                        window.location.href="workbench/activity/detail.do?id="+id;
+                        //关闭关闭操作的模态窗口
+                        $("#editActivityModal").modal("hide");
+
+                    } else {
+                        alert("修改市场活动失败");
+                    }
+                }
+            })
         })
 
         //为保存按钮绑定事件，执行备注添加操作

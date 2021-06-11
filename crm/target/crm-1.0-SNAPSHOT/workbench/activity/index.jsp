@@ -95,6 +95,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 					$("#createActivityModal").modal("show");
 				}
 			})
+		})
 
 			//为保存按钮绑定事件，执行添加操作
 			$("#saveBtn").unbind('click').click(function () {
@@ -179,8 +180,6 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				}
 
 			})
-
-		})
 
 		//页面加载完毕后触发一个方法
 		//默认展开列表的第一页，每页展现两条记录

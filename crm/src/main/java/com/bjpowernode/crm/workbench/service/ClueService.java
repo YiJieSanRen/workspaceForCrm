@@ -13,4 +13,14 @@ public interface ClueService {
     Clue detail(String id);
 
     boolean unbund(String id);
+
+    boolean bund(String cid, String[] aids);
+
+    boolean convert();
+
+    boolean deleteClue(String[] ids);
+
+    Map<String, Object> getUerListAndClue(String id);
+
+    boolean updateClue(Clue clue);
 }
