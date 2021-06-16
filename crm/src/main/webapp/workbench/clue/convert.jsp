@@ -125,7 +125,7 @@ String owner = request.getParameter("owner");*/
 				根据“为客户创建交易”的复选框有没有挑√，来判断是否需要创建交易
 
 			 */
-			if (("#isCreateTransaction").prop("checked")){
+			if ($("#isCreateTransaction").prop("checked")){
 				//alert("需要创建交易")
 				//如果需要创建交易，除了要为后台传递clueId之外，还得为后台传递交易表单中的信息，金额，预计成交日期，交易名称，阶段，市场活动源（id）
 				//window.location.href="workbench/clue/convert.do?clueId=${param.id}&money=";

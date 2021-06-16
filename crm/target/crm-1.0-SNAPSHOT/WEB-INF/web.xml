@@ -92,5 +92,9 @@
         <url-pattern>/workbench/clue/convert.do</url-pattern>
         <url-pattern>/workbench/clue/getUerListAndClue.do</url-pattern>
         <url-pattern>/workbench/clue/updateClue.do</url-pattern>
+        <url-pattern>/workbench/clue/getRemarkListByClueId.do</url-pattern>
+        <url-pattern>/workbench/clue/saveRemark.do</url-pattern>
+        <url-pattern>/workbench/clue/updateRemark.do</url-pattern>
+        <url-pattern>/workbench/clue/deleteRemark.do</url-pattern>
     </servlet-mapping>
 </web-app>

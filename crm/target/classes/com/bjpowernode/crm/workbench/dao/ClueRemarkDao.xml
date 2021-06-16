@@ -5,6 +5,40 @@
 
 <mapper namespace="com.bjpowernode.crm.workbench.dao.ClueRemarkDao">
 
+    <delete id="deleteRemark">
+        delete from tbl_clue_remark where id=#{id}
+    </delete>
+
+    <update id="updateRemark">
+        update tbl_clue_remark set noteContent=#{noteContent},editBy=#{editBy},editTime=#{editTime},editFlag=#{editFlag}
+        where id=#{id}
+    </update>
+
+    <insert id="saveRemark">
+        insert into tbl_clue_remark (
+            id,
+            noteContent,
+            createBy,
+            createTime,
+            editFlag,
+            clueId
+
+        )values (
+            #{id},
+            #{noteContent},
+            #{createBy},
+            #{createTime},
+            #{editFlag},
+            #{clueId}
+
+                                           )
+
+    </insert>
+
+    <select id="getRemarkListByClueId" resultType="ClueRemark">
+        select * from tbl_clue_remark where clueId=#{clueId} order by createTime
+    </select>
+
     <delete id="deleteByAids">
         delete from tbl_clue_remark where clueId in
         <foreach collection="array" item="clueId" open="(" close=")" separator=",">

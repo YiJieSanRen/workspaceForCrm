@@ -148,8 +148,43 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
             })
         })
 
+        $("#deleteBtn").click(function () {
+
+            $.ajax({
+
+                url:"workbench/activity/delete.do",
+                data:{
+                    "id":"${a.id}"
+                },
+                type:"post",
+                dataType:"json",
+                success:function (data){
+
+                    /*
+
+                        data
+                            {"success":true/false}
+
+                     */
+                    if (data.success){
+
+                        //删除成功后
+                        //回到第一页，维持每页展现的记录数
+                        window.location.href="workbench/activity/index.jsp"
+
+
+                    }else {
+                        alert("删除市场活动失败")
+                    }
+
+                }
+            })
+        })
+
         //为保存按钮绑定事件，执行备注添加操作
         $("#saveRemarkBtn").click(function () {
+
+            var id = "${a.id}";
 
             $.ajax({
 
@@ -157,7 +192,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
                 data:{
 
                     "noteContent":$.trim($("#remark").val()),
-                    "activityId":"${a.id}",
+                    "activityId":id,
 
                 },
                 type:"post",
@@ -464,7 +499,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 		</div>
 		<div style="position: relative; height: 50px; width: 250px;  top: -72px; left: 700px;">
 			<button type="button" class="btn btn-default" id="editBtn"><span class="glyphicon glyphicon-edit"></span> 编辑</button>
-			<button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+			<button type="button" class="btn btn-danger" id="deleteBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 		</div>
 	</div>
 	

@@ -3,7 +3,7 @@ package com.bjpowernode.crm.workbench.domain;
 public class Tran {
 	
 	private String id;
-private String owner;		//-------------------------------------外键	关联tbl_user
+	private String owner;		//-------------------------------------外键	关联tbl_user
 	private String money;	//交易金额
 	private String name;	//交易名称
 	private String expectedDate;	//预计成交日期

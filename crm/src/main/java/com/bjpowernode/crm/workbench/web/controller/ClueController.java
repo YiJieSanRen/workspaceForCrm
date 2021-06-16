@@ -10,12 +10,12 @@ import com.bjpowernode.crm.utils.UUIDUtil;
 import com.bjpowernode.crm.vo.PaginationVO;
 import com.bjpowernode.crm.workbench.domain.Activity;
 import com.bjpowernode.crm.workbench.domain.Clue;
+import com.bjpowernode.crm.workbench.domain.ClueRemark;
 import com.bjpowernode.crm.workbench.domain.Tran;
 import com.bjpowernode.crm.workbench.service.ActivityService;
 import com.bjpowernode.crm.workbench.service.ClueService;
 import com.bjpowernode.crm.workbench.service.impl.ActivityServiceImpl;
 import com.bjpowernode.crm.workbench.service.impl.ClueServiceImpl;
-import org.apache.taglibs.standard.extra.spath.Step;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -87,8 +87,96 @@ public class ClueController extends HttpServlet {
 
             updateClue(request,response);
 
+        }else if("/workbench/clue/getRemarkListByClueId.do".equals(path)){
+
+            getRemarkListByClueId(request,response);
+
+        }else if("/workbench/clue/saveRemark.do".equals(path)){
+
+            saveRemark(request,response);
+
+        }else if("/workbench/clue/updateRemark.do".equals(path)){
+
+            updateRemark(request,response);
+
+        }else if("/workbench/clue/deleteRemark.do".equals(path)){
+
+            deleteRemark(request,response);
+
         }
 
+    }
+
+    private void deleteRemark(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("进入到删除线索备注的操作");
+
+        String id = request.getParameter("id");
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+        boolean flag = cs.deleteRemark(id);
+
+        PrintJson.printJsonFlag(response,flag);
+    }
+
+    private void updateRemark(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("进入到备注修改操作");
+
+        String id = request.getParameter("id");
+        String noteContent = request.getParameter("noteContent");
+        String editTime = DateTimeUtil.getSysTime();
+        String editBy = ((User) request.getSession().getAttribute("user")).getName();
+        String editFlag = "1";
+
+        ClueRemark clueRemark = new ClueRemark();
+        clueRemark.setId(id);
+        clueRemark.setNoteContent(noteContent);
+        clueRemark.setEditTime(editTime);
+        clueRemark.setEditBy(editBy);
+        clueRemark.setEditFlag(editFlag);
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+        boolean flag = cs.updateRemark(clueRemark);
+
+        PrintJson.printJsonFlag(response,flag);
+    }
+
+    private void saveRemark(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("进入到备注添加操作");
+
+        String clueId = request.getParameter("clueId");
+        String noteContent = request.getParameter("noteContent");
+        String createBy = ((User)request.getSession().getAttribute("user")).getName();
+        String createTime = DateTimeUtil.getSysTime();
+        String editFlag = "0";
+        String id = UUIDUtil.getUUID();
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+        ClueRemark clueRemark = new ClueRemark();
+        clueRemark.setId(id);
+        clueRemark.setClueId(clueId);
+        clueRemark.setNoteContent(noteContent);
+        clueRemark.setCreateBy(createBy);
+        clueRemark.setCreateTime(createTime);
+        clueRemark.setEditFlag(editFlag);
+
+        boolean flag = cs.saveRemark(clueRemark);
+
+        PrintJson.printJsonFlag(response,flag);
+    }
+
+    private void getRemarkListByClueId(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("进入到根据线索id查询备注单条操作");
+
+        String clueId = request.getParameter("clueId");
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+        List<ClueRemark> crList = cs.getRemarkListByClueId(clueId);
+
+        PrintJson.printJsonObj(response,crList);
     }
 
     private void updateClue(HttpServletRequest request, HttpServletResponse response) {
@@ -172,10 +260,12 @@ public class ClueController extends HttpServlet {
         //接收是否需要创建交易的标记
         String flag = request.getParameter("flag");
 
+        String createBy = ((User) request.getSession().getAttribute("user")).getName();
+
         Tran t = null;
 
         //如果需要创建交易
-        if ("a".equals(flag)){
+        if ("a".equals(flag)) {
 
             t = new Tran();
 
@@ -187,7 +277,6 @@ public class ClueController extends HttpServlet {
             String activityId = request.getParameter("activityId");
             String id = UUIDUtil.getUUID();
             String createTime = DateTimeUtil.getSysTime();
-            String createBy = ((User)request.getSession().getAttribute("user")).getName();
 
             t.setId(id);
             t.setMoney(money);
@@ -198,13 +287,20 @@ public class ClueController extends HttpServlet {
             t.setCreateTime(createTime);
             t.setCreateBy(createBy);
 
-            ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+        }
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
 
-            boolean flag1 = cs.convert();
+        /*
+            为业务层传递的参数：
+                1.必须传递的参数clueId，有了这个clueId之后我们才知道要转换哪条记录
+                2.必须传递的参数t，因为在线索转换的过程中，有可能会临时创建一笔交易（业务层接收的t也可能是个null）
 
-            if (flag1){
-                response.sendRedirect(request.getContextPath()+"/workbench/clue/index.jsp");
-            }
+         */
+
+        boolean flag1 = cs.convert(clueId,t,createBy);
+
+        if (flag1){
+            response.sendRedirect(request.getContextPath()+"/workbench/clue/index.jsp");
         }
 
     }
