@@ -79,5 +79,9 @@ public class SysInitListener implements ServletContextListener {
         //解析properties文件
         ResourceBundle rb = ResourceBundle.getBundle("Stage2Possibility");
 
-        Enumeration<String> e = rb.getKeys();    }
+        Enumeration<String> e = rb.getKeys();
+
+
+
+    }
 }

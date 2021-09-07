@@ -52,6 +52,13 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				02需求分析=25
 				......
 
+				Stage2Possibility.properties这个文件表示的是阶段和键值对之间对应的关系
+				将来，我们通过stage，以及对应关系，来取得可能性这个值
+				这种需求在交易模块中需要大量的使用到
+
+				所以我们就需要将该文件解析在服务器缓存中
+				application.setAttribute(Stage2Possibility.properties文件内容)
+
 		 */
 
 		$(function (){
